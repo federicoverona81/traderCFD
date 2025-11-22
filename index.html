@@ -255,10 +255,10 @@
       text-align: right;
     }
 
-    /* ▶ Pannello volume */
+    /* ▶ Pannello volume: in basso a destra per non coprire l’header */
     .volume-control {
       position: fixed;
-      top: 16px;
+      bottom: 16px;
       right: 16px;
       background: rgba(15, 23, 42, 0.9);
       border: 1px solid #1f2937;
@@ -282,6 +282,7 @@
 </head>
 <body>
   <!-- AUDIO DI SOTTOFONDO -->
+  <!-- Aggiungi "controls" temporaneamente se vuoi verificare che il file parta -->
   <audio id="bgAudio" src="suono.mp3" preload="auto" loop></audio>
 
   <!-- SLIDER VOLUME -->
@@ -617,7 +618,7 @@
         fmtPercent(roiFav);
 
       els.plAdv.textContent =
-        (plAdvRaw >= 0 ? "+" : "–") + fmtMoney(Math.abs(plAdvRaw)).slice(2);
+        (plAdvRaw >= 0 ? "+" : "–") + fmtMoney(Math.abs(plFavRaw)).slice(2);
       els.plAdv.classList.toggle("positive", plAdvRaw >= 0);
       els.plAdv.classList.toggle("negative", plAdvRaw < 0);
       els.plAdvInfo.textContent =
