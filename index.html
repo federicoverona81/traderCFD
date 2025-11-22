@@ -160,15 +160,110 @@
       background: rgba(15, 23, 42, 0.98);
     }
 
-    /* ▶ VOLUME CONTROL PANEL */
+    .direction-toggle {
+      display: inline-flex;
+      border-radius: 999px;
+      padding: 3px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid #1f2937;
+    }
+
+    .direction-toggle button {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      padding: 6px 14px;
+      font-size: 0.82rem;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .direction-toggle button.active-long {
+      background: var(--accent-soft);
+      color: #bbf7d0;
+    }
+
+    .direction-toggle button.active-short {
+      background: var(--accent-red-soft);
+      color: #fecaca;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 600px) {
+      .results-grid { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    .stat {
+      border-radius: 16px;
+      padding: 10px 12px;
+      border: 1px solid #1f2937;
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.8), #020617);
+    }
+
+    .stat.small { font-size: 0.8rem; }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+
+    .stat-value {
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+
+    .stat-value.positive { color: #4ade80; }
+    .stat-value.negative { color: #f97373; }
+
+    .stat-sub {
+      font-size: 0.72rem;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      color: #9ca3af;
+      margin-left: 6px;
+    }
+
+    .pill span.dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #22c55e;
+    }
+
+    footer {
+      margin-top: 14px;
+      font-size: 0.78rem;
+      color: #6b7280;
+      text-align: right;
+    }
+
+    /* ▶ Pannello volume */
     .volume-control {
       position: fixed;
       top: 16px;
       right: 16px;
-      background: rgba(15, 23, 42, 0.8);
+      background: rgba(15, 23, 42, 0.9);
       border: 1px solid #1f2937;
       padding: 10px 14px;
-      border-radius: 12px;
+      border-radius: 16px;
       backdrop-filter: blur(6px);
       color: #e5e7eb;
       font-size: 0.75rem;
@@ -179,33 +274,23 @@
     }
 
     .volume-control input[type="range"] {
-      width: 120px;
+      width: 140px;
       cursor: pointer;
       accent-color: #22c55e;
-    }
-
-    footer {
-      margin-top: 14px;
-      font-size: 0.78rem;
-      color: #6b7280;
-      text-align: right;
     }
   </style>
 </head>
 <body>
-
-  <!-- 🔊 AUDIO + SLIDER -->
+  <!-- AUDIO DI SOTTOFONDO -->
   <audio id="bgAudio" src="suono.mp3" preload="auto" loop></audio>
 
+  <!-- SLIDER VOLUME -->
   <div class="volume-control">
-    <label>Volume sottofondo</label>
+    <label for="volSlider">Volume sottofondo</label>
     <input type="range" id="volSlider" min="0" max="100" value="20" />
   </div>
 
   <div class="app">
-
-    <!-- (tutto il tuo contenuto rimane identico) -->
-
     <header>
       <div>
         <h1>
@@ -223,23 +308,130 @@
       </div>
     </header>
 
-    <!-- TUA GRIGLIA + CARDS + TUTTO IL CODICE ORIGINALE -->
-    <!-- NON MODIFICO NULLA FIN QUI -->
-
     <div class="grid">
       <!-- INPUT -->
       <section class="card">
         <h2>Parametri operazione <span class="badge">Input</span></h2>
+        <div class="inputs-grid" style="margin-bottom: 10px;">
+          <div class="field">
+            <label>Prezzo ask (acquisto) <span class="hint">es. 5.555</span></label>
+            <input id="ask" type="number" step="0.0001" value="5.555" />
+          </div>
+          <div class="field">
+            <label>Prezzo bid (vendita) <span class="hint">es. 5.527</span></label>
+            <input id="bid" type="number" step="0.0001" value="5.527" />
+          </div>
+          <div class="field">
+            <label>Quantità per CFD <span class="hint">es. 20 azioni</span></label>
+            <input id="qtyPerCfd" type="number" step="1" value="20" />
+          </div>
+          <div class="field">
+            <label>N. CFD <span class="hint">quanti contratti apri</span></label>
+            <input id="contracts" type="number" step="1" value="1" />
+          </div>
+          <div class="field">
+            <label>Leva <span class="hint">es. 5 = 1:5</span></label>
+            <input id="leverage" type="number" step="0.1" value="5" />
+          </div>
+          <div class="field">
+            <label>Giorni di holding <span class="hint">per overnight</span></label>
+            <input id="days" type="number" step="1" value="20" />
+          </div>
+          <div class="field">
+            <label>Overnight long (%/giorno) <span class="hint">es. 0.0501</span></label>
+            <input id="overnightLong" type="number" step="0.0001" value="0.0501" />
+          </div>
+          <div class="field">
+            <label>Overnight short (%/giorno) <span class="hint">es. 0.0377</span></label>
+            <input id="overnightShort" type="number" step="0.0001" value="0.0377" />
+          </div>
+          <div class="field">
+            <label>Margine iniziale (%) <span class="hint">es. 20</span></label>
+            <input id="marginInitial" type="number" step="0.1" value="20" />
+          </div>
+          <div class="field">
+            <label>Margine di mantenimento (%)</label>
+            <input id="marginMaintenance" type="number" step="0.1" value="10" />
+          </div>
+          <div class="field">
+            <label>Movimento favorevole (%) <span class="hint">assoluto, es. 2</span></label>
+            <input id="moveFav" type="number" step="0.1" value="2" />
+          </div>
+          <div class="field">
+            <label>Movimento sfavorevole (%) <span class="hint">assoluto, es. 10</span></label>
+            <input id="moveAdv" type="number" step="0.1" value="10" />
+          </div>
+        </div>
 
-        <!-- ... (Tutto identico, lasciato intatto) ... -->
-
+        <div class="field">
+          <label>Direzione</label>
+          <div class="direction-toggle">
+            <button id="btnLong" class="active-long" type="button">Long (Buy)</button>
+            <button id="btnShort" type="button">Short (Sell)</button>
+          </div>
+        </div>
       </section>
 
+      <!-- OUTPUT -->
       <section class="card">
-        <h2>Risultati & Rischio <span class="badge">Output</span></h2>
+        <h2>Risultati &amp; Rischio <span class="badge">Output</span></h2>
+        <div class="results-grid">
+          <div class="stat">
+            <div class="stat-label">Notional &amp; Margine</div>
+            <div class="stat-value" id="notional">€ 0,00</div>
+            <div class="stat-sub" id="marginInfo">Margine richiesto: € 0,00</div>
+          </div>
 
-        <!-- ... Output identico ... -->
+          <div class="stat">
+            <div class="stat-label">Break-even movimento a favore</div>
+            <div class="stat-value" id="breakeven">0,0%</div>
+            <div class="stat-sub" id="breakevenInfo">
+              Movimento minimo per andare circa in pari.
+            </div>
+          </div>
 
+          <div class="stat">
+            <div class="stat-label">Scenario favorevole</div>
+            <div class="stat-value positive" id="plFav">+€ 0,00</div>
+            <div class="stat-sub" id="plFavInfo">Rendimento sul margine: 0,0%</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-label">Scenario sfavorevole</div>
+            <div class="stat-value negative" id="plAdv">–€ 0,00</div>
+            <div class="stat-sub" id="plAdvInfo">Rendimento sul margine: 0,0%</div>
+          </div>
+
+          <div class="stat small">
+            <div class="stat-label">Overnight totale stimato</div>
+            <div class="stat-value" id="overnightCost">€ 0,00</div>
+            <div class="stat-sub">Calcolato su valore nominale × giorni.</div>
+          </div>
+
+          <div class="stat small">
+            <div class="stat-label">Spazio prima di margin call</div>
+            <div class="stat-value" id="marginCallMove">0,0%</div>
+            <div class="stat-sub">
+              Movimento massimo contro di te (circa) prima della liquidazione.
+            </div>
+          </div>
+
+          <div class="stat small">
+            <div class="stat-label">Prezzo uscita simulato (favorevole)</div>
+            <div class="stat-value" id="exitFavPrice">0,000</div>
+            <div class="stat-sub">
+              Bid se sei long, Ask se sei short.
+            </div>
+          </div>
+
+          <div class="stat small">
+            <div class="stat-label">Prezzo uscita simulato (sfavorevole)</div>
+            <div class="stat-value" id="exitAdvPrice">0,000</div>
+            <div class="stat-sub">
+              Bid se sei long, Ask se sei short.
+            </div>
+          </div>
+        </div>
       </section>
     </div>
 
@@ -247,13 +439,14 @@
   </div>
 
   <script>
-    /* 🎵 AUDIO HANDLING */
+    // AUDIO DI SOTTOFONDO + SLIDER
     const bgAudio = document.getElementById("bgAudio");
     const volSlider = document.getElementById("volSlider");
 
-    if (bgAudio) {
-      bgAudio.volume = 0.20;
+    if (bgAudio && volSlider) {
+      bgAudio.volume = 0.2; // 20%
 
+      // Avvio dopo il primo click (autoplay policy)
       window.addEventListener(
         "click",
         () => {
@@ -269,10 +462,7 @@
       });
     }
 
-    /* ------------------------------
-       🔢 TUTTO IL TUO CODICE JS ORIGINALE
-       (non ho tolto nulla, né modificato nulla)
-       ------------------------------ */
+    // --- CODICE ORIGINALE CALCOLATRICE ---
 
     const els = {
       ask: document.getElementById("ask"),
@@ -339,20 +529,14 @@
       const leverage = parseFloat(els.leverage.value) || 1;
       const days = parseFloat(els.days.value) || 0;
 
-      const overnightLong =
-        (parseFloat(els.overnightLong.value.replace(",", ".")) || 0) / 100;
-      const overnightShort =
-        (parseFloat(els.overnightShort.value.replace(",", ".")) || 0) / 100;
+      const overnightLong = (parseFloat(els.overnightLong.value.replace(",", ".")) || 0) / 100;
+      const overnightShort = (parseFloat(els.overnightShort.value.replace(",", ".")) || 0) / 100;
 
-      const marginInitialPct =
-        (parseFloat(els.marginInitial.value.replace(",", ".")) || 0) / 100;
-      const marginMaintPct =
-        (parseFloat(els.marginMaintenance.value.replace(",", ".")) || 0) / 100;
+      const marginInitialPct = (parseFloat(els.marginInitial.value.replace(",", ".")) || 0) / 100;
+      const marginMaintPct = (parseFloat(els.marginMaintenance.value.replace(",", ".")) || 0) / 100;
 
-      const moveFavAbs =
-        Math.abs(parseFloat(els.moveFav.value.replace(",", ".")) || 0);
-      const moveAdvAbs =
-        Math.abs(parseFloat(els.moveAdv.value.replace(",", ".")) || 0);
+      const moveFavAbs = Math.abs(parseFloat(els.moveFav.value.replace(",", ".")) || 0);
+      const moveAdvAbs = Math.abs(parseFloat(els.moveAdv.value.replace(",", ".")) || 0);
 
       const shares = qtyPerCfd * contracts;
       if (!shares || !ask || !bid) return;
@@ -361,46 +545,51 @@
       const entryPrice = isLong ? ask : bid;
       const notional = entryPrice * shares;
 
+      // Spread
       const spreadPerShare = Math.abs(ask - bid);
       const spreadValue = spreadPerShare * shares;
 
+      // Prezzo medio e simulazione prezzi uscita
       const mid = (ask + bid) / 2;
       let exitFav, exitAdv;
 
       if (isLong) {
         const midFav = mid * (1 + moveFavAbs / 100);
         const midAdv = mid * (1 - moveAdvAbs / 100);
-        exitFav = midFav - spreadPerShare / 2;
+        exitFav = midFav - spreadPerShare / 2; // esco a bid
         exitAdv = midAdv - spreadPerShare / 2;
       } else {
         const midFav = mid * (1 - moveFavAbs / 100);
         const midAdv = mid * (1 + moveAdvAbs / 100);
-        exitFav = midFav + spreadPerShare / 2;
+        exitFav = midFav + spreadPerShare / 2; // esco a ask
         exitAdv = midAdv + spreadPerShare / 2;
       }
 
+      // Overnight
       const overnightRate = isLong ? overnightLong : overnightShort;
       const overnightCost = Math.abs(notional * overnightRate * days);
 
+      // Margini
       const marginRequired = notional * marginInitialPct;
       const marginMaint = notional * marginMaintPct;
       const maxLossBeforeLiq = Math.max(marginRequired - marginMaint, 0);
-      const maxMoveAgainstPct =
-        notional > 0 ? (maxLossBeforeLiq / notional) * 100 : 0;
+      const maxMoveAgainstPct = notional > 0 ? (maxLossBeforeLiq / notional) * 100 : 0;
 
-      const breakevenPct =
-        notional > 0 ? ((spreadValue + overnightCost) / notional) * 100 : 0;
+      // Break-even
+      const breakevenPct = notional > 0 ? ((spreadValue + overnightCost) / notional) * 100 : 0;
 
+      // Scenario favorevole
       const plFavRaw =
         (moveFavAbs / 100) * notional - spreadValue - overnightCost;
+
+      // Scenario sfavorevole
       const plAdvRaw =
         -(moveAdvAbs / 100) * notional - spreadValue - overnightCost;
 
-      const roiFav =
-        marginRequired > 0 ? (plFavRaw / marginRequired) * 100 : 0;
-      const roiAdv =
-        marginRequired > 0 ? (plAdvRaw / marginRequired) * 100 : 0;
+      const roiFav = marginRequired > 0 ? (plFavRaw / marginRequired) * 100 : 0;
+      const roiAdv = marginRequired > 0 ? (plAdvRaw / marginRequired) * 100 : 0;
 
+      // Output
       els.notional.textContent = fmtMoney(notional);
       els.marginInfo.textContent =
         "Margine richiesto: " +
@@ -418,8 +607,7 @@
       els.overnightCost.textContent = fmtMoney(overnightCost);
 
       els.plFav.textContent =
-        (plFavRaw >= 0 ? "+" : "–") +
-        fmtMoney(Math.abs(plFavRaw)).slice(2);
+        (plFavRaw >= 0 ? "+" : "–") + fmtMoney(Math.abs(plFavRaw)).slice(2);
       els.plFav.classList.toggle("positive", plFavRaw >= 0);
       els.plFav.classList.toggle("negative", plFavRaw < 0);
       els.plFavInfo.textContent =
@@ -429,8 +617,7 @@
         fmtPercent(roiFav);
 
       els.plAdv.textContent =
-        (plAdvRaw >= 0 ? "+" : "–") +
-        fmtMoney(Math.abs(plAdvRaw)).slice(2);
+        (plAdvRaw >= 0 ? "+" : "–") + fmtMoney(Math.abs(plAdvRaw)).slice(2);
       els.plAdv.classList.toggle("positive", plAdvRaw >= 0);
       els.plAdv.classList.toggle("negative", plAdvRaw < 0);
       els.plAdvInfo.textContent =
@@ -441,6 +628,7 @@
 
       els.marginCallMove.textContent = fmtPercent(maxMoveAgainstPct);
 
+      // Prezzi uscita simulati
       els.exitFavPrice.textContent = fmtPrice(exitFav);
       els.exitAdvPrice.textContent = fmtPrice(exitAdv);
     }
